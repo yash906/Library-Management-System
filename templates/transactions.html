@@ -2,7 +2,6 @@
 {% block title %}Transactions{% endblock %}
 {% block content %}
 <div class="txn-layout">
-  <!-- Left Sidebar -->
   <aside class="txn-sidebar">
     <nav class="txn-nav">
       <a class="txn-nav-item {% if active_tab == 'available' %}active{% endif %}"
@@ -16,7 +15,6 @@
     </nav>
   </aside>
 
-  <!-- Main Content -->
   <section class="txn-content">
     {% block txn_body %}
     <div class="txn-welcome">

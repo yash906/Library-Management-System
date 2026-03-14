@@ -7,46 +7,12 @@
   <div class="grid two">
     <div class="card login-card" style="text-align:center;">
       <h2>Admin Login</h2>
-      <span class="badge">Full Access</span>
-      <p class="notice">Maintenance, Reports, and Transactions.</p>
       <a class="btn" href="{{ url_for('admin_login') }}" style="display:inline-block;margin-top:12px;text-decoration:none;">Login as Admin</a>
     </div>
     <div class="card login-card" style="text-align:center;">
       <h2>User Login</h2>
-      <span class="badge">Reports + Transactions</span>
-      <p class="notice">Reports and Transactions only.</p>
       <a class="btn" href="{{ url_for('user_login') }}" style="display:inline-block;margin-top:12px;text-decoration:none;">Login as User</a>
     </div>
-  </div>
-</section>
-
-<section class="grid three" style="margin-top:24px;">
-  <div class="card">
-    <h3>Maintenance (Admin)</h3>
-    <ul class="features">
-      <li>Add / Update Memberships</li>
-      <li>Add / Update Books & Movies</li>
-      <li>Add / Update Users</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h3>Reports</h3>
-    <ul class="features">
-      <li>Active Issues</li>
-      <li>Master list of Memberships</li>
-      <li>Master list of Books & Movies</li>
-      <li>Overdue Returns</li>
-      <li>Pending Issue Requests</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h3>Transactions</h3>
-    <ul class="features">
-      <li>Check Book Availability</li>
-      <li>Issue a Book</li>
-      <li>Return a Book</li>
-      <li>Pay Fine</li>
-    </ul>
   </div>
 </section>
 {% endblock %}

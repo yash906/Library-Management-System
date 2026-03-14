@@ -81,7 +81,6 @@ function populateFromSerial() {
   issueDateInput.value = opt.dataset.issue || '';
   returnDateInput.value = opt.dataset['return'] || '';
   issueIdInput.value = opt.dataset.issueid || '';
-  // Sync book dropdown by serial_no value
   for (var i = 0; i < bookSelect.options.length; i++) {
     if (bookSelect.options[i].value === opt.value) {
       bookSelect.selectedIndex = i;

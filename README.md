@@ -2,6 +2,13 @@
 
 A web-based Library Management System built with Flask and SQLite. It supports issuing and returning books/movies, membership management, fine calculation, and reporting — with role-based access for Admin and User accounts.
 
+### Testing Credentials
+
+| Role  | Username | Password |
+|-------|----------|----------|
+| Admin | admin    | admin    |
+| User  | user     | user     |
+
 ## Features
 
 ### Transactions

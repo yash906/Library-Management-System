@@ -22,15 +22,11 @@ app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET", "dev-secret")
 db = SQLAlchemy(app)
 
 
-# ---------------------------------------------------------------------------
-# Models
-# ---------------------------------------------------------------------------
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    role = db.Column(db.String(10), nullable=False)  # admin | user
+    role = db.Column(db.String(10), nullable=False)
     name = db.Column(db.String(120), nullable=False)
     status = db.Column(db.String(20), nullable=False, default="active")
 
@@ -52,7 +48,7 @@ class Item(db.Model):
     title = db.Column(db.String(200), nullable=False)
     author = db.Column(db.String(200), nullable=False)
     serial_no = db.Column(db.String(80), unique=True, nullable=False)
-    item_type = db.Column(db.String(20), nullable=False, default="book")  # book | movie
+    item_type = db.Column(db.String(20), nullable=False, default="book")
     category = db.Column(db.String(100), nullable=False, default="General")
     available = db.Column(db.Boolean, default=True)
 
@@ -74,10 +70,6 @@ class Issue(db.Model):
     item = db.relationship("Item", backref="issues")
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 def login_required(role=None):
     def decorator(fn):
         @wraps(fn)
@@ -94,7 +86,6 @@ def login_required(role=None):
     return decorator
 
 
-# Category code mapping
 CATEGORIES = {
     "Science": "SC",
     "Economics": "EC",
@@ -107,7 +98,6 @@ CATEGORY_NAMES = list(CATEGORIES.keys())
 
 
 def generate_serial_no(category, item_type):
-    """Generate serial number like FCB000001, SCM000002, etc."""
     prefix = CATEGORIES.get(category, "XX")
     type_code = "B" if item_type == "book" else "M"
     pattern = f"{prefix}{type_code}%"
@@ -123,10 +113,6 @@ def generate_serial_no(category, item_type):
         next_num = 1
     return f"{prefix}{type_code}{next_num:06d}"
 
-
-# ---------------------------------------------------------------------------
-# Auth routes
-# ---------------------------------------------------------------------------
 
 @app.route("/")
 def index():
@@ -172,10 +158,6 @@ def logout():
     return redirect(url_for("index"))
 
 
-# ---------------------------------------------------------------------------
-# Dashboards
-# ---------------------------------------------------------------------------
-
 @app.route("/admin")
 @login_required(role="admin")
 def admin_dashboard():
@@ -188,17 +170,11 @@ def user_dashboard():
     return render_template("user_dashboard.html")
 
 
-# ---------------------------------------------------------------------------
-# Maintenance (admin only)
-# ---------------------------------------------------------------------------
-
 @app.route("/maintenance")
 @login_required(role="admin")
 def maintenance():
     return render_template("maintenance.html", active_tab="home")
 
-
-# -- Add Membership --------------------------------------------------------
 
 @app.route("/maintenance/membership/add", methods=["GET", "POST"])
 @login_required(role="admin")
@@ -232,8 +208,6 @@ def add_membership():
         return redirect(url_for("add_membership"))
     return render_template("membership_add.html", today=date.today().isoformat(), active_tab="add_membership")
 
-
-# -- Update Membership -----------------------------------------------------
 
 @app.route("/maintenance/membership/update", methods=["GET", "POST"])
 @login_required(role="admin")
@@ -273,8 +247,6 @@ def update_membership():
     return render_template("membership_update.html", membership=None, active_tab="update_membership")
 
 
-# -- Add Book/Movie --------------------------------------------------------
-
 @app.route("/maintenance/item/add", methods=["GET", "POST"])
 @login_required(role="admin")
 def add_item():
@@ -309,8 +281,6 @@ def add_item():
 
     return render_template("item_add.html", categories=CATEGORY_NAMES, active_tab="add_item")
 
-
-# -- Update Book/Movie ----------------------------------------------------
 
 @app.route("/maintenance/item/update", methods=["GET", "POST"])
 @login_required(role="admin")
@@ -355,8 +325,6 @@ def update_item():
 
     return render_template("item_update.html", item=None, categories=CATEGORY_NAMES, active_tab="update_item")
 
-
-# -- User Management -------------------------------------------------------
 
 @app.route("/maintenance/user", methods=["GET", "POST"])
 @login_required(role="admin")
@@ -413,10 +381,6 @@ def manage_user():
 
     return render_template("user_manage.html", target_user=None, active_tab="manage_user")
 
-
-# ---------------------------------------------------------------------------
-# Reports
-# ---------------------------------------------------------------------------
 
 @app.route("/reports")
 @login_required()
@@ -501,17 +465,11 @@ def report_pending():
     return render_template("report_pending.html", pending=rows, active_tab="pending")
 
 
-# ---------------------------------------------------------------------------
-# Transactions
-# ---------------------------------------------------------------------------
-
 @app.route("/transactions")
 @login_required()
 def transactions():
     return render_template("transactions.html", active_tab="home")
 
-
-# -- Book Available (search) -----------------------------------------------
 
 @app.route("/transactions/available", methods=["GET", "POST"])
 @login_required()
@@ -553,8 +511,6 @@ def book_available():
         active_tab="available",
     )
 
-
-# -- Issue Book ------------------------------------------------------------
 
 @app.route("/transactions/issue", methods=["GET", "POST"])
 @login_required()
@@ -637,12 +593,9 @@ def issue_book():
     return redirect(url_for("transactions_issue"))
 
 
-# -- Return Book -----------------------------------------------------------
-
 @app.route("/transactions/return", methods=["GET", "POST"])
 @login_required()
 def transactions_return():
-    # Get all active (unreturned) issues for dropdowns
     active_issues = Issue.query.filter_by(returned=False).all()
     issued_books = []
     for iss in active_issues:
@@ -692,7 +645,6 @@ def return_book():
         issue.remarks = remarks
     db.session.commit()
 
-    # Always redirect to Pay Fine page
     fine = {
         "issue_id": issue.id,
         "title": issue.item.title,
@@ -707,8 +659,6 @@ def return_book():
     }
     return render_template("transactions_fine.html", fine=fine, active_tab="fine")
 
-
-# -- Fine Payment ----------------------------------------------------------
 
 @app.route("/transactions/fine", methods=["GET", "POST"])
 @login_required()
@@ -777,7 +727,6 @@ def pay_fine():
         flash("Issue not found.", "error")
         return redirect(url_for("transactions_return"))
 
-    # Set actual return date if provided from standalone Pay Fine form
     if actual_return_str and not issue.actual_return_date:
         actual_return = date.fromisoformat(actual_return_str)
         issue.actual_return_date = actual_return
@@ -814,10 +763,6 @@ def pay_fine():
     return redirect(url_for("transactions"))
 
 
-# ---------------------------------------------------------------------------
-# AJAX helpers
-# ---------------------------------------------------------------------------
-
 @app.route("/api/item/<serial_no>")
 @login_required()
 def api_get_item(serial_no):
@@ -836,7 +781,6 @@ def api_get_item(serial_no):
 @app.route("/api/issue/<serial_no>")
 @login_required()
 def api_get_issue(serial_no):
-    """Get active issue details by item serial number."""
     issue = Issue.query.join(Item).filter(
         Item.serial_no == serial_no, Issue.returned == False
     ).first()
@@ -872,13 +816,8 @@ def api_get_membership(mid):
     })
 
 
-# ---------------------------------------------------------------------------
-# Seed / Init
-# ---------------------------------------------------------------------------
-
 @app.cli.command("init-db")
 def init_db_cmd():
-    """Reset and seed the database."""
     _seed_db()
 
 
