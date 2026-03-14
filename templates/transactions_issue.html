@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Issue Book{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Check Availability</h1>
+  <form method="post" action="{{ url_for('transactions_issue') }}">
+    <label>Search title or author (one required)</label>
+    <input name="query" placeholder="Title or author" required>
+    <button class="btn" type="submit">Search</button>
+  </form>
+  <table class="table" style="margin-top:12px;">
+    <tr><th>Select</th><th>Serial</th><th>Title</th><th>Author</th><th>Available</th></tr>
+    {% for item in items %}
+      <tr>
+        <td><input type="radio" name="selected_serial" value="{{ item.serial_no }}" form="issue-form"></td>
+        <td>{{ item.serial_no }}</td>
+        <td>{{ item.title }}</td>
+        <td>{{ item.author }}</td>
+        <td>{{ 'Yes' if item.available else 'No' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No results</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h1>Issue Book</h1>
+  <form id="issue-form" method="post" action="{{ url_for('issue_book') }}">
+    <label>Member ID (required)</label>
+    <input name="membership_id" required>
+    <label>Serial No (auto from selection)</label>
+    <input name="serial_no" placeholder="Select above" required readonly onfocus="this.blur()">
+    <label>Issue Date</label>
+    <input type="date" name="issue_date" value="{{ today }}" min="{{ today }}" required>
+    <label>Return Date (≤ 15 days from issue)</label>
+    <input type="date" name="return_date" value="{{ default_return }}" max="{{ default_return }}" required>
+    <label>Remarks (optional)</label>
+    <textarea name="remarks" placeholder="Optional"></textarea>
+    <button class="btn" type="submit">Issue</button>
+  </form>
+  <p class="notice">Author is auto-populated server-side. Return date defaults to issue date + 15 and cannot exceed +15.</p>
+</div>
+{% endblock %}

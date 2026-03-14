@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}User Dashboard{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>User Dashboard</h1>
+  <p>Access reports and transactions.</p>
+  <div class="grid two">
+    <a class="card nav-link" href="{{ url_for('reports') }}"><h3>Reports</h3><p class="notice">View active issues, master lists, overdue and pending requests.</p></a>
+    <a class="card nav-link" href="{{ url_for('transactions_issue') }}"><h3>Transactions</h3><p class="notice">Check availability, issue, return, pay fines.</p></a>
+  </div>
+</div>
+{% endblock %}

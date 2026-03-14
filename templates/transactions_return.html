@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Return Book{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Lookup Issued Book</h1>
+  <form method="post" action="{{ url_for('transactions_return') }}">
+    <label>Serial No (required)</label>
+    <input name="serial_lookup" required>
+    <button class="btn" type="submit">Fetch Issue</button>
+  </form>
+  <p class="notice">Author and issue details auto-populate after lookup. Return date starts with the planned date and can be edited earlier or later.</p>
+</div>
+
+{% if issue %}
+<div class="card">
+  <h2>Return Details</h2>
+  <p><strong>Title:</strong> {{ issue.title }} | <strong>Author:</strong> {{ issue.author }} | <strong>Serial:</strong> {{ issue.serial_no }}</p>
+  <p><strong>Issue Date:</strong> {{ issue.issue_date }} | <strong>Planned Return:</strong> {{ issue.planned_return }}</p>
+  <form method="post" action="{{ url_for('return_book') }}">
+    <input type="hidden" name="issue_id" value="{{ issue.issue_id }}">
+    <label>Actual Return Date</label>
+    <input type="date" name="return_date" value="{{ issue.planned_return }}" required>
+    <label>Remarks (optional)</label>
+    <textarea name="remarks" placeholder="Optional"></textarea>
+    <button class="btn" type="submit">Confirm &amp; Continue to Fine</button>
+  </form>
+</div>
+{% endif %}
+
+{% if fine %}
+<div class="card">
+  <h2>Fine Payment</h2>
+  <p><strong>Title:</strong> {{ fine.title }} | <strong>Author:</strong> {{ fine.author }} | <strong>Serial:</strong> {{ fine.serial_no }}</p>
+  <p><strong>Issue Date:</strong> {{ fine.issue_date }} | <strong>Planned Return:</strong> {{ fine.planned_return }} | <strong>Actual Return:</strong> {{ fine.actual_return }}</p>
+  <p>Fine due: {{ fine.amount }} | Days overdue: {{ fine.days_overdue }}</p>
+  <form method="post" action="{{ url_for('pay_fine') }}">
+    <input type="hidden" name="issue_id" value="{{ fine.issue_id }}">
+    {% if fine.amount > 0 %}
+      <label><input type="checkbox" name="fine_paid" value="yes" required> Fine Paid</label>
+    {% else %}
+      <input type="hidden" name="fine_paid" value="yes">
+      <p class="notice">No fine due. Confirm to close the return.</p>
+    {% endif %}
+    <label>Remarks (optional)</label>
+    <textarea name="remarks"></textarea>
+    <button class="btn" type="submit">Confirm Return</button>
+  </form>
+  <p class="notice">You always reach this step; if there is a fine it must be marked paid before completion.</p>
+</div>
+{% endif %}
+{% endblock %}

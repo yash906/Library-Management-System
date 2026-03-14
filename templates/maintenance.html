@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Maintenance{% endblock %}
+{% block content %}
+<div class="grid two">
+  <div class="card">
+    <h2>Add Membership</h2>
+    <form method="post" action="{{ url_for('add_membership') }}">
+      <label>Name</label>
+      <input name="name" required>
+      <label>Email</label>
+      <input name="email" type="email" required>
+      <label>Duration</label>
+      <select name="duration_months">
+        <option value="6">6 months (default)</option>
+        <option value="12">1 year</option>
+        <option value="24">2 years</option>
+      </select>
+      <button class="btn" type="submit">Create</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Update Membership</h2>
+    <form method="post" action="{{ url_for('update_membership') }}">
+      <label>Membership ID (required)</label>
+      <input name="membership_id" required>
+      <label>Extend by</label>
+      <select name="extend_months">
+        <option value="0">No change</option>
+        <option value="6" selected>+6 months (default)</option>
+        <option value="12">+1 year</option>
+        <option value="24">+2 years</option>
+      </select>
+      <label>Status</label>
+      <select name="status">
+        <option value="active">Active</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <button class="btn" type="submit">Update</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Add Book/Movie</h2>
+    <form method="post" action="{{ url_for('add_item') }}">
+      <label>Type</label>
+      <select name="item_type">
+        <option value="book">Book (default)</option>
+        <option value="movie">Movie</option>
+      </select>
+      <label>Title</label>
+      <input name="title" required>
+      <label>Author/Director</label>
+      <input name="author" required>
+      <label>Serial No</label>
+      <input name="serial_no" required>
+      <button class="btn" type="submit">Add Item</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Update Book/Movie</h2>
+    <form method="post" action="{{ url_for('update_item') }}">
+      <label>Serial No (required)</label>
+      <input name="serial_no" required>
+      <label>Title</label>
+      <input name="title" required>
+      <label>Author/Director</label>
+      <input name="author" required>
+      <label>Availability</label>
+      <select name="available">
+        <option value="true">Available</option>
+        <option value="false">Unavailable</option>
+      </select>
+      <button class="btn" type="submit">Update Item</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Add User</h2>
+    <form method="post" action="{{ url_for('add_user') }}">
+      <label>Username</label>
+      <input name="username" required>
+      <label>Password</label>
+      <input name="password" type="password" required>
+      <label>Name</label>
+      <input name="name" required>
+      <label>Role</label>
+      <select name="role">
+        <option value="user">User (default)</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button class="btn" type="submit">Add User</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Update User</h2>
+    <form method="post" action="{{ url_for('update_user') }}">
+      <label>Username (required)</label>
+      <input name="username" required>
+      <label>Name</label>
+      <input name="name" required>
+      <label>Role</label>
+      <select name="role">
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <label>Password (leave blank to keep)</label>
+      <input name="password" type="password">
+      <button class="btn" type="submit">Update User</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="grid two">
+  <div class="card">
+    <h2>Active Issues</h2>
+    <table class="table">
+      <tr><th>Member</th><th>Title</th><th>Issue Date</th><th>Return Date</th></tr>
+      {% for issue in active_issues %}
+        <tr><td>{{ issue.member_name }}</td><td>{{ issue.title }}</td><td>{{ issue.issue_date }}</td><td>{{ issue.return_date }}</td></tr>
+      {% else %}
+        <tr><td colspan="4">No active issues</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Overdue Returns</h2>
+    <table class="table">
+      <tr><th>Member</th><th>Title</th><th>Return Date</th><th>Days Overdue</th></tr>
+      {% for row in overdue %}
+        <tr><td>{{ row.member_name }}</td><td>{{ row.title }}</td><td>{{ row.return_date }}</td><td>{{ row.days_overdue }}</td></tr>
+      {% else %}
+        <tr><td colspan="4">None overdue</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Master List: Memberships</h2>
+    <table class="table">
+      <tr><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>End Date</th></tr>
+      {% for m in memberships %}
+        <tr><td>{{ m.id }}</td><td>{{ m.name }}</td><td>{{ m.email }}</td><td>{{ m.status }}</td><td>{{ m.end_date }}</td></tr>
+      {% else %}
+        <tr><td colspan="5">No memberships</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Master List: Books</h2>
+    <table class="table">
+      <tr><th>Serial</th><th>Title</th><th>Author</th><th>Available</th></tr>
+      {% for b in books %}
+        <tr><td>{{ b.serial_no }}</td><td>{{ b.title }}</td><td>{{ b.author }}</td><td>{{ 'Yes' if b.available else 'No' }}</td></tr>
+      {% else %}
+        <tr><td colspan="4">No books</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Master List: Movies</h2>
+    <table class="table">
+      <tr><th>Serial</th><th>Title</th><th>Director</th><th>Available</th></tr>
+      {% for m in movies %}
+        <tr><td>{{ m.serial_no }}</td><td>{{ m.title }}</td><td>{{ m.author }}</td><td>{{ 'Yes' if m.available else 'No' }}</td></tr>
+      {% else %}
+        <tr><td colspan="4">No movies</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Pending Issue Requests</h2>
+    <table class="table">
+      <tr><th>Member</th><th>Title</th><th>Requested</th></tr>
+      {% for p in pending %}
+        <tr><td>{{ p.member_name }}</td><td>{{ p.title }}</td><td>{{ p.created_at }}</td></tr>
+      {% else %}
+        <tr><td colspan="3">No pending requests</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

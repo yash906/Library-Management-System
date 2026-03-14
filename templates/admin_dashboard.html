@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Admin Dashboard</h1>
+  <p>Use the shortcuts below.</p>
+  <div class="grid two">
+    <a class="card nav-link" href="{{ url_for('maintenance') }}"><h3>Maintenance</h3><p class="notice">Add/update memberships, items, and users.</p></a>
+    <a class="card nav-link" href="{{ url_for('reports') }}"><h3>Reports</h3><p class="notice">Active issues, masters, overdue, pending.</p></a>
+    <a class="card nav-link" href="{{ url_for('transactions_issue') }}"><h3>Transactions</h3><p class="notice">Check availability, issue, return, pay fines.</p></a>
+  </div>
+</div>
+{% endblock %}
