@@ -1,0 +1,134 @@
+{% extends 'transactions.html' %}
+{% block title %}Pay Fine{% endblock %}
+{% block txn_body %}
+<h2>Pay Fine</h2>
+
+{% if not issue %}
+<form method="post" action="{{ url_for('transactions_fine') }}">
+  <input type="hidden" name="action" value="fetch">
+
+  <label for="book_name">Enter Book Name</label>
+  <input id="book_name" name="book_name" type="text" placeholder="Enter book title">
+
+  <label for="serial_no">Serial No <span class="required">*</span></label>
+  <input id="serial_no" name="serial_no" type="text" placeholder="Enter serial number" required>
+
+  <label for="author_display">Enter Author</label>
+  <input id="author_display" type="text" readonly disabled placeholder="Auto-populated">
+
+  <label for="issue_date_display">Issue Date</label>
+  <input id="issue_date_display" type="date" readonly disabled>
+
+  <label for="return_date_display">Return Date</label>
+  <input id="return_date_display" type="date" readonly disabled>
+
+  <label for="actual_return_display">Actual Return Date</label>
+  <input id="actual_return_display" type="date" value="{{ today }}" readonly disabled>
+
+  <label for="fine_display">Fine Calculated</label>
+  <input id="fine_display" type="text" value="0" readonly disabled>
+
+  <label class="radio-label">
+    <input type="checkbox" disabled>
+    Fine Paid
+  </label>
+
+  <label for="remarks_display">Remarks (Non Mandatory)</label>
+  <textarea id="remarks_display" disabled placeholder="Remarks"></textarea>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('transactions') }}">Cancel</a>
+    <button class="btn" type="submit">Fetch Details</button>
+  </div>
+</form>
+
+{% else %}
+
+<form method="post" action="{{ url_for('pay_fine') }}">
+  <input type="hidden" name="issue_id" value="{{ issue.issue_id }}">
+
+  <label for="book_name">Enter Book Name</label>
+  <input id="book_name" type="text" value="{{ issue.title }}" readonly disabled>
+
+  <label for="author">Enter Author</label>
+  <input id="author" type="text" value="{{ issue.author }}" readonly disabled>
+
+  <label for="serial_no">Serial No</label>
+  <input id="serial_no" type="text" value="{{ issue.serial_no }}" readonly disabled>
+
+  <label for="issue_date">Issue Date</label>
+  <input id="issue_date" type="date" value="{{ issue.issue_date }}" readonly disabled>
+
+  <label for="return_date">Return Date</label>
+  <input id="return_date" type="date" value="{{ issue.return_date }}" readonly disabled>
+
+  <label for="actual_return_date">Actual Return Date</label>
+  <input id="actual_return_date" name="actual_return_date" type="date" value="{{ issue.actual_return_date }}" required>
+
+  <label for="fine_calc">Fine Calculated</label>
+  <input id="fine_calc" type="text" value="Rs {{ issue.fine_amount }}" readonly disabled>
+
+  {% if issue.fine_amount > 0 %}
+  <label class="radio-label" style="font-size:15px;">
+    <input type="checkbox" name="fine_paid" value="yes">
+    Fine Paid
+  </label>
+  {% else %}
+  <label class="radio-label" style="font-size:15px;">
+    <input type="checkbox" checked disabled>
+    Fine Paid
+  </label>
+  <input type="hidden" name="fine_paid" value="yes">
+  {% endif %}
+
+  <label for="remarks">Remarks (Non Mandatory)</label>
+  <textarea id="remarks" name="remarks" placeholder="Remarks"></textarea>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('transactions_fine') }}">Cancel</a>
+    <button class="btn" type="submit">Confirm</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+var serialInput = document.getElementById('serial_no');
+var authorDisplay = document.getElementById('author_display');
+var bookNameInput = document.getElementById('book_name');
+var issueDateDisplay = document.getElementById('issue_date_display');
+var returnDateDisplay = document.getElementById('return_date_display');
+
+if (serialInput && !serialInput.readOnly) {
+  serialInput.addEventListener('blur', function() {
+    var sn = this.value.trim();
+    if (!sn) return;
+    fetch('/api/issue/' + encodeURIComponent(sn))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.error) {
+          if (authorDisplay) authorDisplay.value = data.author;
+          if (bookNameInput && !bookNameInput.value) bookNameInput.value = data.title;
+          if (issueDateDisplay) issueDateDisplay.value = data.issue_date;
+          if (returnDateDisplay) returnDateDisplay.value = data.return_date;
+        }
+      })
+      .catch(function() {});
+  });
+}
+
+var actualReturnInput = document.getElementById('actual_return_date');
+var fineCalc = document.getElementById('fine_calc');
+var returnDateInput = document.getElementById('return_date');
+if (actualReturnInput && fineCalc && returnDateInput) {
+  actualReturnInput.addEventListener('change', function() {
+    var actual = new Date(this.value);
+    var planned = new Date(returnDateInput.value);
+    var diff = Math.floor((actual - planned) / (1000 * 60 * 60 * 24));
+    var fine = diff > 0 ? diff * 1.0 : 0;
+    fineCalc.value = 'Rs ' + fine.toFixed(1);
+  });
+}
+</script>
+{% endblock %}

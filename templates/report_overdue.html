@@ -1,0 +1,24 @@
+{% extends 'reports.html' %}
+{% block title %}Overdue Returns{% endblock %}
+{% block report_body %}
+<h2>Overdue Returns</h2>
+<table class="table">
+  <thead>
+    <tr><th>Member</th><th>Title</th><th>Serial No</th><th>Return Date</th><th>Days Overdue</th><th>Fine (Rs)</th></tr>
+  </thead>
+  <tbody>
+    {% for row in overdue %}
+      <tr>
+        <td>{{ row.member_name }}</td>
+        <td>{{ row.title }}</td>
+        <td>{{ row.serial_no }}</td>
+        <td>{{ row.return_date }}</td>
+        <td>{{ row.days_overdue }}</td>
+        <td>{{ row.fine }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">No overdue returns.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

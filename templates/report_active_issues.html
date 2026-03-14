@@ -1,0 +1,24 @@
+{% extends 'reports.html' %}
+{% block title %}Active Issues{% endblock %}
+{% block report_body %}
+<h2>Active Issues</h2>
+<table class="table">
+  <thead>
+    <tr><th>Member</th><th>Membership ID</th><th>Title</th><th>Serial No</th><th>Issue Date</th><th>Return Date</th></tr>
+  </thead>
+  <tbody>
+    {% for issue in issues %}
+      <tr>
+        <td>{{ issue.member_name }}</td>
+        <td>{{ issue.membership_id }}</td>
+        <td>{{ issue.title }}</td>
+        <td>{{ issue.serial_no }}</td>
+        <td>{{ issue.issue_date }}</td>
+        <td>{{ issue.return_date }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">No active issues.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

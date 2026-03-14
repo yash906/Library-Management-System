@@ -1,0 +1,51 @@
+{% extends 'transactions.html' %}
+{% block title %}Pay Fine{% endblock %}
+{% block txn_body %}
+<h2>Pay Fine</h2>
+
+<form method="post" action="{{ url_for('pay_fine') }}">
+  <input type="hidden" name="issue_id" value="{{ fine.issue_id }}">
+
+  <label for="book_name">Enter Book Name</label>
+  <input id="book_name" type="text" value="{{ fine.title }}" readonly disabled>
+
+  <label for="author">Enter Author</label>
+  <input id="author" type="text" value="{{ fine.author }}" readonly disabled>
+
+  <label for="serial_no">Serial No</label>
+  <input id="serial_no" type="text" value="{{ fine.serial_no }}" readonly disabled>
+
+  <label for="issue_date">Issue Date</label>
+  <input id="issue_date" type="date" value="{{ fine.issue_date }}" readonly disabled>
+
+  <label for="return_date">Return Date</label>
+  <input id="return_date" type="date" value="{{ fine.return_date }}" readonly disabled>
+
+  <label for="actual_return">Actual Return Date</label>
+  <input id="actual_return" type="date" value="{{ fine.actual_return }}" readonly disabled>
+
+  <label for="fine_calc">Fine Calculated</label>
+  <input id="fine_calc" type="text" value="Rs {{ fine.fine_amount }}" readonly disabled>
+
+  {% if fine.fine_amount > 0 %}
+  <label class="radio-label" style="font-size:15px;">
+    <input type="checkbox" name="fine_paid" value="yes">
+    Fine Paid
+  </label>
+  {% else %}
+  <label class="radio-label" style="font-size:15px;">
+    <input type="checkbox" checked disabled>
+    Fine Paid
+  </label>
+  <input type="hidden" name="fine_paid" value="yes">
+  {% endif %}
+
+  <label for="remarks">Remarks (Non Mandatory)</label>
+  <textarea id="remarks" name="remarks" placeholder="Remarks"></textarea>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('transactions_return') }}">Cancel</a>
+    <button class="btn" type="submit">Confirm</button>
+  </div>
+</form>
+{% endblock %}

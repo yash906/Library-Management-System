@@ -1,44 +1,137 @@
-{% extends 'base.html' %}
+{% extends 'transactions.html' %}
 {% block title %}Issue Book{% endblock %}
-{% block content %}
-<div class="card">
-  <h1>Check Availability</h1>
-  <form method="post" action="{{ url_for('transactions_issue') }}">
-    <label>Search title or author (one required)</label>
-    <input name="query" placeholder="Title or author" required>
-    <button class="btn" type="submit">Search</button>
-  </form>
-  <table class="table" style="margin-top:12px;">
-    <tr><th>Select</th><th>Serial</th><th>Title</th><th>Author</th><th>Available</th></tr>
-    {% for item in items %}
-      <tr>
-        <td><input type="radio" name="selected_serial" value="{{ item.serial_no }}" form="issue-form"></td>
-        <td>{{ item.serial_no }}</td>
-        <td>{{ item.title }}</td>
-        <td>{{ item.author }}</td>
-        <td>{{ 'Yes' if item.available else 'No' }}</td>
-      </tr>
-    {% else %}
-      <tr><td colspan="5">No results</td></tr>
-    {% endfor %}
-  </table>
-</div>
+{% block txn_body %}
+<h2>Issue Book / Movie</h2>
 
-<div class="card">
-  <h1>Issue Book</h1>
-  <form id="issue-form" method="post" action="{{ url_for('issue_book') }}">
-    <label>Member ID (required)</label>
-    <input name="membership_id" required>
-    <label>Serial No (auto from selection)</label>
-    <input name="serial_no" placeholder="Select above" required readonly onfocus="this.blur()">
-    <label>Issue Date</label>
-    <input type="date" name="issue_date" value="{{ today }}" min="{{ today }}" required>
-    <label>Return Date (≤ 15 days from issue)</label>
-    <input type="date" name="return_date" value="{{ default_return }}" max="{{ default_return }}" required>
-    <label>Remarks (optional)</label>
-    <textarea name="remarks" placeholder="Optional"></textarea>
-    <button class="btn" type="submit">Issue</button>
-  </form>
-  <p class="notice">Author is auto-populated server-side. Return date defaults to issue date + 15 and cannot exceed +15.</p>
-</div>
+<form id="issue-form" method="post" action="{{ url_for('issue_book') }}" onsubmit="return validateIssue()">
+  <label for="membership_id">Membership ID <span class="required">*</span></label>
+  <select id="membership_id" name="membership_id" required>
+    <option value="">-- Select Member --</option>
+    {% for m in memberships %}
+      <option value="{{ m.id }}">#{{ m.id }} - {{ m.name }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="book_name">Book Name <span class="required">*</span></label>
+  <select id="book_name" required>
+    <option value="">-- Select Book / Movie --</option>
+    {% for it in available_items %}
+      <option value="{{ it.serial_no }}" data-author="{{ it.author }}" data-type="{{ it.item_type }}">{{ it.title }}</option>
+    {% endfor %}
+  </select>
+
+  <input type="hidden" id="serial_no" name="serial_no" value="{{ item.serial_no if item else '' }}">
+
+  <label for="author_display">Author / Director (auto-populated)</label>
+  <input id="author_display" type="text" value="{{ item.author if item else '' }}" readonly disabled>
+
+  <label for="serial_display">Serial No (auto-populated)</label>
+  <input id="serial_display" type="text" value="{{ item.serial_no if item else '' }}" readonly disabled>
+
+  <label for="issue_date">Issue Date <span class="required">*</span></label>
+  <input id="issue_date" name="issue_date" type="date" value="{{ today }}" min="{{ today }}" required>
+
+  <label for="return_date">Return Date (max 15 days from issue) <span class="required">*</span></label>
+  <input id="return_date" name="return_date" type="date" value="{{ default_return }}" min="{{ today }}" max="{{ default_return }}" required>
+
+  <label for="remarks">Remarks (optional)</label>
+  <textarea id="remarks" name="remarks" placeholder="Optional remarks"></textarea>
+
+  <div id="issue-error" class="alert error" style="display:none;"></div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('transactions') }}">Cancel</a>
+    <button class="btn" type="submit">Confirm</button>
+  </div>
+</form>
+<p class="notice" style="margin-top:8px;">Return date defaults to issue date + 15 days and cannot exceed it.</p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var bookSelect = document.getElementById('book_name');
+var serialHidden = document.getElementById('serial_no');
+var authorDisplay = document.getElementById('author_display');
+var serialDisplay = document.getElementById('serial_display');
+var issueDate = document.getElementById('issue_date');
+var returnDate = document.getElementById('return_date');
+var errorDiv = document.getElementById('issue-error');
+
+// Pre-select if item was passed via query string
+{% if item %}
+(function() {
+  for (var i = 0; i < bookSelect.options.length; i++) {
+    if (bookSelect.options[i].value === '{{ item.serial_no }}') {
+      bookSelect.selectedIndex = i;
+      break;
+    }
+  }
+})();
+{% endif %}
+
+bookSelect.addEventListener('change', function() {
+  var opt = this.options[this.selectedIndex];
+  if (!opt.value) {
+    serialHidden.value = '';
+    authorDisplay.value = '';
+    serialDisplay.value = '';
+    return;
+  }
+  serialHidden.value = opt.value;
+  authorDisplay.value = opt.dataset.author || '';
+  serialDisplay.value = opt.value;
+});
+
+issueDate.addEventListener('change', function() {
+  var d = new Date(this.value);
+  d.setDate(d.getDate() + 15);
+  var maxReturn = d.toISOString().split('T')[0];
+  returnDate.min = this.value;
+  returnDate.max = maxReturn;
+  returnDate.value = maxReturn;
+});
+
+function validateIssue() {
+  var membership = document.getElementById('membership_id').value;
+  var book = bookSelect.value;
+  var iDate = issueDate.value;
+  var rDate = returnDate.value;
+
+  if (!membership || !book || !iDate || !rDate) {
+    errorDiv.textContent = 'All fields marked with * are required.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+
+  var today = new Date('{{ today }}');
+  today.setHours(0, 0, 0, 0);
+  var issueDt = new Date(iDate);
+  issueDt.setHours(0, 0, 0, 0);
+  var returnDt = new Date(rDate);
+  returnDt.setHours(0, 0, 0, 0);
+
+  if (issueDt < today) {
+    errorDiv.textContent = 'Issue date cannot be earlier than today.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+
+  if (returnDt < issueDt) {
+    errorDiv.textContent = 'Return date cannot be before issue date.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+
+  var maxDate = new Date(iDate);
+  maxDate.setDate(maxDate.getDate() + 15);
+  if (returnDt > maxDate) {
+    errorDiv.textContent = 'Return date cannot be more than 15 days from issue date.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+
+  errorDiv.style.display = 'none';
+  return true;
+}
+</script>
 {% endblock %}

@@ -1,13 +1,52 @@
 {% extends 'base.html' %}
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Admin Home Page{% endblock %}
 {% block content %}
 <div class="card">
-  <h1>Admin Dashboard</h1>
-  <p>Use the shortcuts below.</p>
-  <div class="grid two">
-    <a class="card nav-link" href="{{ url_for('maintenance') }}"><h3>Maintenance</h3><p class="notice">Add/update memberships, items, and users.</p></a>
-    <a class="card nav-link" href="{{ url_for('reports') }}"><h3>Reports</h3><p class="notice">Active issues, masters, overdue, pending.</p></a>
-    <a class="card nav-link" href="{{ url_for('transactions_issue') }}"><h3>Transactions</h3><p class="notice">Check availability, issue, return, pay fines.</p></a>
+  <h1>Admin Home Page</h1>
+
+  <div class="grid three" style="margin-bottom:24px;">
+    <a class="btn" href="{{ url_for('maintenance') }}" style="text-decoration:none;text-align:center;">Maintenance</a>
+    <a class="btn" href="{{ url_for('reports') }}" style="text-decoration:none;text-align:center;">Reports</a>
+    <a class="btn" href="{{ url_for('transactions') }}" style="text-decoration:none;text-align:center;">Transactions</a>
   </div>
+
+  <h2>Product Details</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Code No From</th>
+        <th>Code No To</th>
+        <th>Category</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>SC(B/M)000001</td>
+        <td>SC(B/M)000004</td>
+        <td>Science</td>
+      </tr>
+      <tr>
+        <td>EC(B/M)000001</td>
+        <td>EC(B/M)000004</td>
+        <td>Economics</td>
+      </tr>
+      <tr>
+        <td>FC(B/M)000001</td>
+        <td>FC(B/M)000004</td>
+        <td>Fiction</td>
+      </tr>
+      <tr>
+        <td>CH(B/M)000001</td>
+        <td>CH(B/M)000004</td>
+        <td>Children</td>
+      </tr>
+      <tr>
+        <td>PD(B/M)000001</td>
+        <td>PD(B/M)000004</td>
+        <td>Personal Development</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="notice" style="margin-top:8px;">B = Book, M = Movie. Serial numbers follow the category prefix format above.</p>
 </div>
 {% endblock %}

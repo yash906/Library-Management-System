@@ -2,83 +2,51 @@
 {% block title %}Welcome | Library Management{% endblock %}
 {% block content %}
 <section class="hero">
-  <h1>Welcome</h1>
-  <p>Roles: Admin (maintenance, reports, transactions) and User (reports, transactions). Backend uses Flask + SQLite.</p>
+  <h1>Library Management System</h1>
+  <p>Select your login type to get started.</p>
   <div class="grid two">
-    <div class="card">
+    <div class="card login-card" style="text-align:center;">
       <h2>Admin Login</h2>
-      <span class="badge">Full access</span>
-      <form action="{{ url_for('admin_login') }}" method="post">
-        <label for="admin-username">Username</label>
-        <input id="admin-username" name="username" type="text" placeholder="admin" required />
-        <label for="admin-password">Password</label>
-        <input id="admin-password" name="password" type="password" placeholder="••••••" required />
-        <button class="btn" type="submit">Login as Admin</button>
-      </form>
-      <p class="notice">Passwords are hidden on input. Admin can reach maintenance, reports, and transactions.</p>
+      <span class="badge">Full Access</span>
+      <p class="notice">Maintenance, Reports, and Transactions.</p>
+      <a class="btn" href="{{ url_for('admin_login') }}" style="display:inline-block;margin-top:12px;text-decoration:none;">Login as Admin</a>
     </div>
-
-    <div class="card">
+    <div class="card login-card" style="text-align:center;">
       <h2>User Login</h2>
       <span class="badge">Reports + Transactions</span>
-      <form action="{{ url_for('user_login') }}" method="post">
-        <label for="user-username">Username</label>
-        <input id="user-username" name="username" type="text" placeholder="user" required />
-        <label for="user-password">Password</label>
-        <input id="user-password" name="password" type="password" placeholder="••••••" required />
-        <button class="btn" type="submit">Login as User</button>
-      </form>
-      <p class="notice">Users cannot access maintenance screens.</p>
+      <p class="notice">Reports and Transactions only.</p>
+      <a class="btn" href="{{ url_for('user_login') }}" style="display:inline-block;margin-top:12px;text-decoration:none;">Login as User</a>
     </div>
   </div>
 </section>
 
-<section class="grid three" style="margin-top: 24px;">
+<section class="grid three" style="margin-top:24px;">
   <div class="card">
-    <h2>Maintenance (Admin)</h2>
-    <p>Seed data for reports and transactions.</p>
+    <h3>Maintenance (Admin)</h3>
     <ul class="features">
-      <li>Add/Update memberships (6m default; 1y/2y options)</li>
-      <li>Add/Update books or movies (book default; all fields required)</li>
-      <li>Add/Update users (name required; new user default)</li>
+      <li>Add / Update Memberships</li>
+      <li>Add / Update Books & Movies</li>
+      <li>Add / Update Users</li>
     </ul>
-    <a class="btn secondary" href="{{ url_for('maintenance') }}">Go to Maintenance</a>
   </div>
-
   <div class="card">
-    <h2>Reports</h2>
-    <p>Accessible by admin and users.</p>
+    <h3>Reports</h3>
     <ul class="features">
-      <li>Active issues</li>
-      <li>Master list of memberships</li>
-      <li>Master list of movies</li>
-      <li>Master list of books</li>
-      <li>Overdue returns</li>
-      <li>Pending issue requests</li>
+      <li>Active Issues</li>
+      <li>Master list of Memberships</li>
+      <li>Master list of Books & Movies</li>
+      <li>Overdue Returns</li>
+      <li>Pending Issue Requests</li>
     </ul>
-    <a class="btn secondary" href="{{ url_for('reports') }}">View Reports</a>
   </div>
-
   <div class="card">
-    <h2>Transactions</h2>
-    <p>Issue, return, and pay fines with in-form validation.</p>
+    <h3>Transactions</h3>
     <ul class="features">
-      <li>Check availability (radio select a book row)</li>
-      <li>Issue book (title required; author auto; return date ≤ +15d; remarks optional)</li>
-      <li>Return book (title, serial no.; author/issue date auto; editable return date)</li>
-      <li>Fine payment (confirm after fine paid when due)</li>
+      <li>Check Book Availability</li>
+      <li>Issue a Book</li>
+      <li>Return a Book</li>
+      <li>Pay Fine</li>
     </ul>
-    <a class="btn secondary" href="{{ url_for('transactions_issue') }}">Start Transaction</a>
   </div>
-</section>
-
-<section class="card" style="margin-top: 24px;">
-  <h2>Notes for Backend</h2>
-  <ul class="features">
-    <li>SQLite persistence (members, users, books/movies, issues, returns, fines).</li>
-    <li>Enforce validation: book availability; required fields; return date rules; fine paid before completion.</li>
-    <li>Default selections: book vs movie → book; new user; membership → 6 months; membership extension → 6 months; return date prefilled to issue date + 15 days.</li>
-    <li>Chart link on every page (header uses the flow chart image).</li>
-  </ul>
 </section>
 {% endblock %}

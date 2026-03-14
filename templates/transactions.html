@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Transactions{% endblock %}
+{% block content %}
+<div class="txn-layout">
+  <!-- Left Sidebar -->
+  <aside class="txn-sidebar">
+    <nav class="txn-nav">
+      <a class="txn-nav-item {% if active_tab == 'available' %}active{% endif %}"
+         href="{{ url_for('book_available') }}">Is book available?</a>
+      <a class="txn-nav-item {% if active_tab == 'issue' %}active{% endif %}"
+         href="{{ url_for('transactions_issue') }}">Issue book?</a>
+      <a class="txn-nav-item {% if active_tab == 'return' %}active{% endif %}"
+         href="{{ url_for('transactions_return') }}">Return book?</a>
+      <a class="txn-nav-item {% if active_tab == 'fine' %}active{% endif %}"
+         href="{{ url_for('transactions_fine') }}">Pay Fine?</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <section class="txn-content">
+    {% block txn_body %}
+    <div class="txn-welcome">
+      <h2>Transactions</h2>
+      <p>Select an option from the sidebar to get started.</p>
+    </div>
+    {% endblock %}
+  </section>
+</div>
+{% endblock %}

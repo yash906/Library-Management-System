@@ -1,0 +1,93 @@
+{% extends 'maintenance.html' %}
+{% block title %}Update Book / Movie{% endblock %}
+{% block maint_body %}
+<h2>Update Book / Movie</h2>
+
+{% if not item %}
+<form id="fetch-form" method="post" action="{{ url_for('update_item') }}" onsubmit="return validateFetch()">
+  <input type="hidden" name="action" value="fetch">
+  <label for="serial_no">Serial No <span class="required">*</span></label>
+  <input id="serial_no" name="serial_no" type="text" required>
+
+  <div id="fetch-error" class="alert error" style="display:none;"></div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('maintenance') }}">Cancel</a>
+    <button class="btn" type="submit">Fetch Item</button>
+  </div>
+</form>
+{% else %}
+<div class="info-box">
+  <p><strong>Current:</strong> {{ item.title }} by {{ item.author }} ({{ item.serial_no }})</p>
+  <p><strong>Type:</strong> {{ item.item_type | title }} | <strong>Category:</strong> {{ item.category }} | <strong>Available:</strong> {{ 'Yes' if item.available else 'No' }}</p>
+</div>
+<form id="update-item-form" method="post" action="{{ url_for('update_item') }}" onsubmit="return validateUpdate()">
+  <input type="hidden" name="action" value="update">
+  <input type="hidden" name="serial_no" value="{{ item.serial_no }}">
+
+  <label>Type <span class="required">*</span></label>
+  <div class="radio-group">
+    <label class="radio-label"><input type="radio" name="item_type" value="book" {{ 'checked' if item.item_type == 'book' }}> Book</label>
+    <label class="radio-label"><input type="radio" name="item_type" value="movie" {{ 'checked' if item.item_type == 'movie' }}> Movie</label>
+  </div>
+
+  <label for="title">Title <span class="required">*</span></label>
+  <input id="title" name="title" type="text" value="{{ item.title }}" required>
+
+  <label for="author">Author / Director <span class="required">*</span></label>
+  <input id="author" name="author" type="text" value="{{ item.author }}" required>
+
+  <label for="category">Category <span class="required">*</span></label>
+  <select id="category" name="category" required>
+    <option value="">-- Select Category --</option>
+    {% for cat in categories %}
+      <option value="{{ cat }}" {{ 'selected' if cat == item.category }}>{{ cat }}</option>
+    {% endfor %}
+  </select>
+
+  <label>Status</label>
+  <div class="radio-group">
+    <label class="radio-label"><input type="radio" name="status" value="active" checked> Active</label>
+    <label class="radio-label"><input type="radio" name="status" value="withdrawn"> Withdrawn</label>
+  </div>
+
+  <div id="update-error" class="alert error" style="display:none;"></div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('update_item') }}">Cancel</a>
+    <button class="btn" type="submit">Update Item</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function validateFetch() {
+  var serial = document.getElementById('serial_no').value.trim();
+  var errorDiv = document.getElementById('fetch-error');
+  if (!serial) {
+    errorDiv.textContent = 'Serial number is mandatory.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  errorDiv.style.display = 'none';
+  return true;
+}
+
+function validateUpdate() {
+  var title = document.getElementById('title').value.trim();
+  var author = document.getElementById('author').value.trim();
+  var category = document.getElementById('category').value;
+  var errorDiv = document.getElementById('update-error');
+
+  if (!title || !author || !category) {
+    errorDiv.textContent = 'All fields are mandatory. Please fill in every field.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  errorDiv.style.display = 'none';
+  return true;
+}
+</script>
+{% endblock %}

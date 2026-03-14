@@ -1,0 +1,23 @@
+{% extends 'reports.html' %}
+{% block title %}Master List: Books{% endblock %}
+{% block report_body %}
+<h2>Master List: Books</h2>
+<table class="table">
+  <thead>
+    <tr><th>Serial No</th><th>Title</th><th>Author</th><th>Category</th><th>Available</th></tr>
+  </thead>
+  <tbody>
+    {% for b in books %}
+      <tr>
+        <td>{{ b.serial_no }}</td>
+        <td>{{ b.title }}</td>
+        <td>{{ b.author }}</td>
+        <td>{{ b.category }}</td>
+        <td>{{ 'Yes' if b.available else 'No' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No books found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

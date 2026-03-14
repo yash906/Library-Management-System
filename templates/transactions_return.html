@@ -1,51 +1,96 @@
-{% extends 'base.html' %}
+{% extends 'transactions.html' %}
 {% block title %}Return Book{% endblock %}
-{% block content %}
-<div class="card">
-  <h1>Lookup Issued Book</h1>
-  <form method="post" action="{{ url_for('transactions_return') }}">
-    <label>Serial No (required)</label>
-    <input name="serial_lookup" required>
-    <button class="btn" type="submit">Fetch Issue</button>
-  </form>
-  <p class="notice">Author and issue details auto-populate after lookup. Return date starts with the planned date and can be edited earlier or later.</p>
-</div>
+{% block txn_body %}
+<h2>Return Book</h2>
 
-{% if issue %}
-<div class="card">
-  <h2>Return Details</h2>
-  <p><strong>Title:</strong> {{ issue.title }} | <strong>Author:</strong> {{ issue.author }} | <strong>Serial:</strong> {{ issue.serial_no }}</p>
-  <p><strong>Issue Date:</strong> {{ issue.issue_date }} | <strong>Planned Return:</strong> {{ issue.planned_return }}</p>
-  <form method="post" action="{{ url_for('return_book') }}">
-    <input type="hidden" name="issue_id" value="{{ issue.issue_id }}">
-    <label>Actual Return Date</label>
-    <input type="date" name="return_date" value="{{ issue.planned_return }}" required>
-    <label>Remarks (optional)</label>
-    <textarea name="remarks" placeholder="Optional"></textarea>
-    <button class="btn" type="submit">Confirm &amp; Continue to Fine</button>
-  </form>
-</div>
-{% endif %}
+<form method="post" action="{{ url_for('return_book') }}">
+  <input type="hidden" id="issue_id" name="issue_id" value="">
 
-{% if fine %}
-<div class="card">
-  <h2>Fine Payment</h2>
-  <p><strong>Title:</strong> {{ fine.title }} | <strong>Author:</strong> {{ fine.author }} | <strong>Serial:</strong> {{ fine.serial_no }}</p>
-  <p><strong>Issue Date:</strong> {{ fine.issue_date }} | <strong>Planned Return:</strong> {{ fine.planned_return }} | <strong>Actual Return:</strong> {{ fine.actual_return }}</p>
-  <p>Fine due: {{ fine.amount }} | Days overdue: {{ fine.days_overdue }}</p>
-  <form method="post" action="{{ url_for('pay_fine') }}">
-    <input type="hidden" name="issue_id" value="{{ fine.issue_id }}">
-    {% if fine.amount > 0 %}
-      <label><input type="checkbox" name="fine_paid" value="yes" required> Fine Paid</label>
-    {% else %}
-      <input type="hidden" name="fine_paid" value="yes">
-      <p class="notice">No fine due. Confirm to close the return.</p>
-    {% endif %}
-    <label>Remarks (optional)</label>
-    <textarea name="remarks"></textarea>
-    <button class="btn" type="submit">Confirm Return</button>
-  </form>
-  <p class="notice">You always reach this step; if there is a fine it must be marked paid before completion.</p>
-</div>
-{% endif %}
+  <label for="book_name">Enter Book Name <span class="required">*</span></label>
+  <select id="book_name" required>
+    <option value="">-- Select Book Name --</option>
+    {% for book in issued_books %}
+      <option value="{{ book.serial_no }}" data-author="{{ book.author }}" data-issue="{{ book.issue_date }}" data-return="{{ book.return_date }}" data-issueid="{{ book.issue_id }}">{{ book.title }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="author_display">Enter Author</label>
+  <input id="author_display" type="text" readonly disabled placeholder="Auto-populated">
+
+  <label for="serial_no">Serial No <span class="required">*</span></label>
+  <select id="serial_no" name="serial_no_display" required>
+    <option value="">-- Select Serial No --</option>
+    {% for book in issued_books %}
+      <option value="{{ book.serial_no }}" data-title="{{ book.title }}" data-author="{{ book.author }}" data-issue="{{ book.issue_date }}" data-return="{{ book.return_date }}" data-issueid="{{ book.issue_id }}">{{ book.serial_no }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="issue_date">Issue Date</label>
+  <input id="issue_date" type="date" readonly disabled>
+
+  <label for="return_date">Return Date <span class="required">*</span></label>
+  <input id="return_date" name="return_date" type="date" required>
+
+  <label for="remarks">Remarks (Non Mandatory)</label>
+  <textarea id="remarks" name="remarks" placeholder="Remarks"></textarea>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('transactions') }}">Cancel</a>
+    <button class="btn" type="submit">Confirm</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var bookSelect = document.getElementById('book_name');
+var serialSelect = document.getElementById('serial_no');
+var authorDisplay = document.getElementById('author_display');
+var issueDateInput = document.getElementById('issue_date');
+var returnDateInput = document.getElementById('return_date');
+var issueIdInput = document.getElementById('issue_id');
+
+function populateFromBook() {
+  var opt = bookSelect.options[bookSelect.selectedIndex];
+  if (!opt.value) {
+    authorDisplay.value = '';
+    issueDateInput.value = '';
+    returnDateInput.value = '';
+    issueIdInput.value = '';
+    serialSelect.value = '';
+    return;
+  }
+  authorDisplay.value = opt.dataset.author || '';
+  issueDateInput.value = opt.dataset.issue || '';
+  returnDateInput.value = opt.dataset['return'] || '';
+  issueIdInput.value = opt.dataset.issueid || '';
+  serialSelect.value = opt.value;
+}
+
+function populateFromSerial() {
+  var opt = serialSelect.options[serialSelect.selectedIndex];
+  if (!opt.value) {
+    authorDisplay.value = '';
+    issueDateInput.value = '';
+    returnDateInput.value = '';
+    issueIdInput.value = '';
+    bookSelect.value = '';
+    return;
+  }
+  authorDisplay.value = opt.dataset.author || '';
+  issueDateInput.value = opt.dataset.issue || '';
+  returnDateInput.value = opt.dataset['return'] || '';
+  issueIdInput.value = opt.dataset.issueid || '';
+  // Sync book dropdown by serial_no value
+  for (var i = 0; i < bookSelect.options.length; i++) {
+    if (bookSelect.options[i].value === opt.value) {
+      bookSelect.selectedIndex = i;
+      break;
+    }
+  }
+}
+
+bookSelect.addEventListener('change', populateFromBook);
+serialSelect.addEventListener('change', populateFromSerial);
+</script>
 {% endblock %}

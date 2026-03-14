@@ -1,0 +1,126 @@
+{% extends 'maintenance.html' %}
+{% block title %}User Management{% endblock %}
+{% block maint_body %}
+<h2>User Management</h2>
+
+{% if not target_user %}
+<h3>Add New User</h3>
+<form id="add-user-form" method="post" action="{{ url_for('manage_user') }}" onsubmit="return validateAdd()">
+  <input type="hidden" name="action" value="add">
+  <input type="hidden" name="user_type" value="new">
+
+  <label for="username">Username <span class="required">*</span></label>
+  <input id="username" name="username" type="text" required>
+
+  <label for="password">Password <span class="required">*</span></label>
+  <input id="password" name="password" type="password" required>
+
+  <label for="name">Full Name <span class="required">*</span></label>
+  <input id="name" name="name" type="text" required>
+
+  <label>Role</label>
+  <div class="radio-group">
+    <label class="radio-label"><input type="radio" name="role" value="user" checked> User (default)</label>
+    <label class="radio-label"><input type="radio" name="role" value="admin"> Admin</label>
+  </div>
+
+  <div id="add-error" class="alert error" style="display:none;"></div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('maintenance') }}">Cancel</a>
+    <button class="btn" type="submit">Add User</button>
+  </div>
+</form>
+
+<hr style="margin:24px 0;border:0;border-top:1px solid var(--border);">
+
+<h3>Update Existing User</h3>
+<form id="fetch-user-form" method="post" action="{{ url_for('manage_user') }}" onsubmit="return validateFetch()">
+  <input type="hidden" name="action" value="fetch">
+  <label for="fetch_username">Username <span class="required">*</span></label>
+  <input id="fetch_username" name="username" type="text" required>
+
+  <div id="fetch-error" class="alert error" style="display:none;"></div>
+
+  <div class="txn-actions">
+    <button class="btn" type="submit">Fetch User</button>
+  </div>
+</form>
+{% else %}
+<div class="info-box">
+  <p><strong>Username:</strong> {{ target_user.username }} | <strong>Name:</strong> {{ target_user.name }} | <strong>Role:</strong> {{ target_user.role }} | <strong>Status:</strong> {{ target_user.status }}</p>
+</div>
+<form id="update-user-form" method="post" action="{{ url_for('manage_user') }}" onsubmit="return validateUpdate()">
+  <input type="hidden" name="action" value="update">
+  <input type="hidden" name="user_id" value="{{ target_user.id }}">
+
+  <label for="upd_name">Full Name <span class="required">*</span></label>
+  <input id="upd_name" name="name" type="text" value="{{ target_user.name }}" required>
+
+  <label>Role</label>
+  <div class="radio-group">
+    <label class="radio-label"><input type="radio" name="role" value="user" {{ 'checked' if target_user.role == 'user' }}> User</label>
+    <label class="radio-label"><input type="radio" name="role" value="admin" {{ 'checked' if target_user.role == 'admin' }}> Admin</label>
+  </div>
+
+  <label>Status</label>
+  <div class="radio-group">
+    <label class="radio-label"><input type="radio" name="status" value="active" {{ 'checked' if target_user.status == 'active' }}> Active</label>
+    <label class="radio-label"><input type="radio" name="status" value="inactive" {{ 'checked' if target_user.status == 'inactive' }}> Inactive</label>
+  </div>
+
+  <label for="upd_password">New Password (leave blank to keep current)</label>
+  <input id="upd_password" name="password" type="password">
+
+  <div id="update-error" class="alert error" style="display:none;"></div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('manage_user') }}">Cancel</a>
+    <button class="btn" type="submit">Update User</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function validateAdd() {
+  var username = document.getElementById('username').value.trim();
+  var password = document.getElementById('password').value;
+  var name = document.getElementById('name').value.trim();
+  var errorDiv = document.getElementById('add-error');
+
+  if (!username || !password || !name) {
+    errorDiv.textContent = 'All fields are mandatory for a new user.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  errorDiv.style.display = 'none';
+  return true;
+}
+
+function validateFetch() {
+  var username = document.getElementById('fetch_username').value.trim();
+  var errorDiv = document.getElementById('fetch-error');
+  if (!username) {
+    errorDiv.textContent = 'Username is mandatory.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  errorDiv.style.display = 'none';
+  return true;
+}
+
+function validateUpdate() {
+  var name = document.getElementById('upd_name').value.trim();
+  var errorDiv = document.getElementById('update-error');
+  if (!name) {
+    errorDiv.textContent = 'Name is mandatory.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  errorDiv.style.display = 'none';
+  return true;
+}
+</script>
+{% endblock %}

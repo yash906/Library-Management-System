@@ -1,0 +1,25 @@
+{% extends 'reports.html' %}
+{% block title %}Master List: Memberships{% endblock %}
+{% block report_body %}
+<h2>Master List: Memberships</h2>
+<table class="table">
+  <thead>
+    <tr><th>ID</th><th>Name</th><th>Contact</th><th>Aadhar</th><th>Start Date</th><th>End Date</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    {% for m in memberships %}
+      <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.name }}</td>
+        <td>{{ m.contact_number }}</td>
+        <td>{{ m.aadhar_card_no }}</td>
+        <td>{{ m.start_date }}</td>
+        <td>{{ m.end_date }}</td>
+        <td><span class="badge {{ 'badge-danger' if m.status == 'cancelled' else '' }}">{{ m.status }}</span></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7">No memberships found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}User Login{% endblock %}
 {% block content %}
-<div class="card">
+<div class="card narrow">
   <h1>User Login</h1>
+  <p class="notice">Users can access Reports and Transactions.</p>
   <form action="{{ url_for('user_login') }}" method="post">
     <label for="username">Username</label>
     <input id="username" name="username" type="text" required>
@@ -10,6 +11,6 @@
     <input id="password" name="password" type="password" required>
     <button class="btn" type="submit">Login</button>
   </form>
-  <p class="notice">Users cannot access maintenance screens.</p>
+  <p class="notice" style="margin-top:12px;">Admin? <a href="{{ url_for('admin_login') }}">Login as Admin</a></p>
 </div>
 {% endblock %}

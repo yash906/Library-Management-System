@@ -1,0 +1,23 @@
+{% extends 'reports.html' %}
+{% block title %}Master List: Movies{% endblock %}
+{% block report_body %}
+<h2>Master List: Movies</h2>
+<table class="table">
+  <thead>
+    <tr><th>Serial No</th><th>Title</th><th>Director</th><th>Category</th><th>Available</th></tr>
+  </thead>
+  <tbody>
+    {% for m in movies %}
+      <tr>
+        <td>{{ m.serial_no }}</td>
+        <td>{{ m.title }}</td>
+        <td>{{ m.author }}</td>
+        <td>{{ m.category }}</td>
+        <td>{{ 'Yes' if m.available else 'No' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No movies found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

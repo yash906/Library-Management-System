@@ -1,0 +1,99 @@
+{% extends 'transactions.html' %}
+{% block title %}Book Availability{% endblock %}
+{% block txn_body %}
+<h2>Book Availability</h2>
+<form id="search-form" method="post" action="{{ url_for('book_available') }}" onsubmit="return validateSearch()">
+  <label for="book_name">Enter Book Name</label>
+  <select id="book_name" name="book_name">
+    <option value="">-- Select Book Name --</option>
+    {% for title in all_titles %}
+      <option value="{{ title }}" {{ 'selected' if title == selected_title }}>{{ title }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="author">Enter Author</label>
+  <select id="author" name="author">
+    <option value="">-- Select Author --</option>
+    {% for author in all_authors %}
+      <option value="{{ author }}" {{ 'selected' if author == selected_author }}>{{ author }}</option>
+    {% endfor %}
+  </select>
+
+  <div id="search-error" class="alert error" style="display:none;">Please select at least a Book Name or an Author before searching.</div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('transactions') }}">Cancel</a>
+    <button class="btn" type="submit">Search</button>
+  </div>
+</form>
+
+{% if searched %}
+  {% if items %}
+  <div style="margin-top:16px;">
+    <h3>Search Results</h3>
+    <table class="table">
+      <thead>
+        <tr><th>Serial No</th><th>Type</th><th>Title</th><th>Author</th><th>Category</th><th>Available</th><th>Select</th></tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr class="{{ 'row-unavailable' if not item.available else '' }}">
+            <td>{{ item.serial_no }}</td>
+            <td>{{ item.item_type | title }}</td>
+            <td>{{ item.title }}</td>
+            <td>{{ item.author }}</td>
+            <td>{{ item.category }}</td>
+            <td>{{ 'Yes' if item.available else 'No' }}</td>
+            <td>
+              {% if item.available %}
+                <input type="radio" name="selected_serial" value="{{ item.serial_no }}" form="goto-issue">
+              {% else %}
+                <span class="notice">--</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <form id="goto-issue" action="{{ url_for('transactions_issue') }}" method="get" style="margin-top:12px;">
+      <button class="btn" type="submit" onclick="return prepareIssue()">Issue Selected Item</button>
+    </form>
+  </div>
+  {% else %}
+  <div style="margin-top:16px;">
+    <p>No results found. Try different search criteria.</p>
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function validateSearch() {
+  var bookName = document.getElementById('book_name').value;
+  var author = document.getElementById('author').value;
+  var errorDiv = document.getElementById('search-error');
+  if (!bookName && !author) {
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  errorDiv.style.display = 'none';
+  return true;
+}
+
+function prepareIssue() {
+  var selected = document.querySelector('input[name="selected_serial"]:checked');
+  if (!selected) {
+    alert('Please select an available item from the list.');
+    return false;
+  }
+  var form = document.getElementById('goto-issue');
+  var input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'serial_no';
+  input.value = selected.value;
+  form.appendChild(input);
+  return true;
+}
+</script>
+{% endblock %}

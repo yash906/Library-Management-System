@@ -1,0 +1,23 @@
+{% extends 'reports.html' %}
+{% block title %}Pending Issue Requests{% endblock %}
+{% block report_body %}
+<h2>Pending Issue Requests</h2>
+<table class="table">
+  <thead>
+    <tr><th>Member</th><th>Title</th><th>Serial No</th><th>Issue Date</th><th>Return Date</th></tr>
+  </thead>
+  <tbody>
+    {% for p in pending %}
+      <tr>
+        <td>{{ p.member_name }}</td>
+        <td>{{ p.title }}</td>
+        <td>{{ p.serial_no }}</td>
+        <td>{{ p.issue_date }}</td>
+        <td>{{ p.return_date }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No pending requests.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'maintenance.html' %}
+{% block title %}Update Membership{% endblock %}
+{% block maint_body %}
+<h2>Update Membership</h2>
+
+{% if not membership %}
+<form id="fetch-form" method="post" action="{{ url_for('update_membership') }}" onsubmit="return validateFetch()">
+  <input type="hidden" name="action" value="fetch">
+  <label for="membership_id">Membership Number <span class="required">*</span></label>
+  <input id="membership_id" name="membership_id" type="number" required>
+
+  <div id="fetch-error" class="alert error" style="display:none;"></div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('maintenance') }}">Cancel</a>
+    <button class="btn" type="submit">Fetch Membership</button>
+  </div>
+</form>
+{% else %}
+<div class="info-box">
+  <p><strong>ID:</strong> {{ membership.id }} | <strong>Name:</strong> {{ membership.name }}</p>
+  <p><strong>Contact:</strong> {{ membership.contact_number }} | <strong>Aadhar:</strong> {{ membership.aadhar_card_no }}</p>
+  <p><strong>Status:</strong> {{ membership.status }} | <strong>Start:</strong> {{ membership.start_date }} | <strong>End:</strong> {{ membership.end_date }}</p>
+</div>
+<form method="post" action="{{ url_for('update_membership') }}">
+  <input type="hidden" name="action" value="update">
+  <input type="hidden" name="membership_id" value="{{ membership.id }}">
+
+  <label>Extend Membership</label>
+  <div class="radio-group">
+    <label class="radio-label"><input type="radio" name="extend_months" value="6" checked> +6 Months (default)</label>
+    <label class="radio-label"><input type="radio" name="extend_months" value="12"> +1 Year</label>
+    <label class="radio-label"><input type="radio" name="extend_months" value="24"> +2 Years</label>
+  </div>
+
+  <label>Cancel Membership?</label>
+  <div class="radio-group">
+    <label class="radio-label"><input type="radio" name="cancel_membership" value="no" checked> No</label>
+    <label class="radio-label"><input type="radio" name="cancel_membership" value="yes"> Yes &mdash; Cancel Membership</label>
+  </div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('update_membership') }}">Cancel</a>
+    <button class="btn" type="submit">Update Membership</button>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function validateFetch() {
+  var mid = document.getElementById('membership_id').value.trim();
+  var errorDiv = document.getElementById('fetch-error');
+  if (!mid) {
+    errorDiv.textContent = 'Membership number is mandatory.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  errorDiv.style.display = 'none';
+  return true;
+}
+</script>
+{% endblock %}

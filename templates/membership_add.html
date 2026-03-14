@@ -1,0 +1,56 @@
+{% extends 'maintenance.html' %}
+{% block title %}Add Membership{% endblock %}
+{% block maint_body %}
+<h2>Add Membership</h2>
+<form id="add-membership-form" method="post" action="{{ url_for('add_membership') }}" onsubmit="return validateForm()">
+  <label for="name">Name <span class="required">*</span></label>
+  <input id="name" name="name" type="text" required>
+
+  <label for="contact_number">Contact Number <span class="required">*</span></label>
+  <input id="contact_number" name="contact_number" type="text" required>
+
+  <label for="contact_address">Contact Address <span class="required">*</span></label>
+  <input id="contact_address" name="contact_address" type="text" required>
+
+  <label for="aadhar_card_no">Aadhar Card No <span class="required">*</span></label>
+  <input id="aadhar_card_no" name="aadhar_card_no" type="text" required>
+
+  <label for="start_date">Start Date <span class="required">*</span></label>
+  <input id="start_date" name="start_date" type="date" value="{{ today }}" required>
+
+  <label>Membership Duration <span class="required">*</span></label>
+  <div class="radio-group">
+    <label class="radio-label"><input type="radio" name="duration_months" value="6" checked> 6 Months (default)</label>
+    <label class="radio-label"><input type="radio" name="duration_months" value="12"> 1 Year</label>
+    <label class="radio-label"><input type="radio" name="duration_months" value="24"> 2 Years</label>
+  </div>
+
+  <div id="form-error" class="alert error" style="display:none;"></div>
+
+  <div class="txn-actions">
+    <a class="btn secondary" href="{{ url_for('maintenance') }}">Cancel</a>
+    <button class="btn" type="submit">Create Membership</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function validateForm() {
+  var name = document.getElementById('name').value.trim();
+  var contact = document.getElementById('contact_number').value.trim();
+  var address = document.getElementById('contact_address').value.trim();
+  var aadhar = document.getElementById('aadhar_card_no').value.trim();
+  var startDate = document.getElementById('start_date').value;
+  var errorDiv = document.getElementById('form-error');
+
+  if (!name || !contact || !address || !aadhar || !startDate) {
+    errorDiv.textContent = 'All fields are mandatory. Please fill in every field.';
+    errorDiv.style.display = 'block';
+    return false;
+  }
+  errorDiv.style.display = 'none';
+  return true;
+}
+</script>
+{% endblock %}
